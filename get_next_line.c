@@ -1,18 +1,27 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ahmalman <ahmalman@student.42abudhabi.a    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/10 18:21:56 by ahmalman          #+#    #+#             */
+/*   Updated: 2023/08/10 18:33:45 by ahmalman         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line.h"
-#include <stdio.h>
 
-char	*reader(int fd, char *lineextra, int buffsize)
+static char	*reader(int fd, char *lineextra, int buffsize, int i)
 {
-	char *textsave;
-	int i;
+	char	*textsave;
 
-	i = 1;
 	textsave = (char *) malloc (sizeof(char) * buffsize + 1);
 	if (!textsave)
 		return (NULL);
 	while (i == 1 && !ft_strchr(lineextra, '\n'))
-	{ 
-		i = read(fd , textsave , buffsize);
+	{
+		i = read(fd, textsave, buffsize);
 		if (i == -1)
 		{
 			free (textsave);
@@ -23,21 +32,20 @@ char	*reader(int fd, char *lineextra, int buffsize)
 		if (i)
 			i = 1;
 	}
+	free(textsave);
 	if (lineextra[0] == '\0')
 	{
 		free(lineextra);
-		free(textsave);
 		return (NULL);
 	}
-	free (textsave);
 	return (lineextra);
 }
 
-char *copy (char *srt1)
+static char	*copy(char *srt1)
 {
 	int		i;
 	char	*res;
-	
+
 	i = 0;
 	if (!srt1)
 		return (NULL);
@@ -47,7 +55,7 @@ char *copy (char *srt1)
 	if (res == NULL)
 		return (NULL);
 	i = 0;
-	while (srt1[i] != '\n' && srt1[i] != '\0')  
+	while (srt1[i] != '\n' && srt1[i] != '\0')
 	{
 		res[i] = srt1[i];
 		i++;
@@ -61,13 +69,10 @@ char *copy (char *srt1)
 	return (res);
 }
 
-char *lastline(char *srt2)
+static char	*lastline(char *srt2, int i, int c)
 {
-	int i;
-	int c;
-	char * lsat;
+	char	*lsat;
 
-	i = 0;
 	if (!srt2)
 		return (NULL);
 	while (srt2[i] != '\n' && srt2[i] != '\0')
@@ -87,7 +92,7 @@ char *lastline(char *srt2)
 		return (NULL);
 	i = 0;
 	while (srt2[c] != '\0')
-		lsat[i++] = srt2[c++]; 
+		lsat[i++] = srt2[c++];
 	lsat[i] = '\0';
 	free(srt2);
 	return (lsat);
@@ -95,33 +100,35 @@ char *lastline(char *srt2)
 
 char	*get_next_line(int fd)
 {
-	static char *lineextra;
+	static char	*lineextra;
 	char		*srt;
 
-	lineextra = reader(fd, lineextra ,BUFFER_SIZE);
+	if (fd < 0)
+		return (NULL);
+	lineextra = reader(fd, lineextra, BUFFER_SIZE, 1);
 	if (lineextra == NULL)
 		return (NULL);
 	srt = copy(lineextra);
-	lineextra = lastline(lineextra);
+	lineextra = lastline(lineextra, 0, 0);
 	return (srt);
 }
 
-int main ()
-{
-	char *annar;
+// int main ()
+// {
+	// char *annar;
 
-	int fd = open("input.txt", O_RDWR);
+	// int fd = open("input.txt", O_RDWR);
 	// annar = get_next_line(fd);
 	// printf ("%s",annar);
-	annar = get_next_line(fd);
-	printf ("%s",annar);
+	// annar = get_next_line(fd);
+	// printf ("%s",annar);
 	// while (annar)
 	// {
 	// 	annar = get_next_line(fd);
 	// 	printf ("%s",annar);
 	// }
-	
-
+	// 
+// 
 	// char *buff;
 
 	// buff = malloc(BUFFER_SIZE + 1);
@@ -134,4 +141,4 @@ int main ()
 // 	i = i + 1;
 // 	printf("%d\n", i);
 // 	return (0);
-}
+// }
