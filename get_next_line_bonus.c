@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ahmalman <ahmalman@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/10 18:21:56 by ahmalman          #+#    #+#             */
-/*   Updated: 2023/08/10 18:52:45 by ahmalman         ###   ########.fr       */
+/*   Updated: 2023/08/10 18:54:04 by ahmalman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 static char	*reader(int fd, char *lineextra, int buffsize, int i)
 {
@@ -100,16 +100,16 @@ static char	*lastline(char *srt2, int i, int c)
 
 char	*get_next_line(int fd)
 {
-	static char	*lineextra;
+	static char	*lineextra[1024];
 	char		*srt;
 
 	if (fd < 0)
 		return (NULL);
-	lineextra = reader(fd, lineextra, BUFFER_SIZE, 1);
-	if (lineextra == NULL)
+	lineextra[fd] = reader(fd, lineextra[fd], BUFFER_SIZE, 1);
+	if (lineextra[fd] == NULL)
 		return (NULL);
-	srt = copy(lineextra);
-	lineextra = lastline(lineextra, 0, 0);
+	srt = copy(lineextra[fd]);
+	lineextra[fd] = lastline(lineextra[fd], 0, 0);
 	return (srt);
 }
 
@@ -123,12 +123,16 @@ char	*get_next_line(int fd)
 // 	int fd1 = open("input2.txt", O_RDWR);
 // 	annar = get_next_line(fd1);
 // 	printf ("%s",annar);
-// 	// annar = get_next_line(fd);
-// 	// printf ("%s",annar);
-// 	// while (annar)
-// 	// {
-// 	// 	annar = get_next_line(fd);
-// 	// 	printf ("%s",annar);
-// 	// }
+// 	annar = get_next_line(fd);
+// 	printf ("%s",annar);
+// 	annar = get_next_line(fd1);
+// 	printf ("%s",annar);
+// 	annar = get_next_line(fd);
+// 	printf ("%s",annar);
+// 	while (annar)
+// 	{
+// 		annar = get_next_line(fd);
+// 		printf ("%s",annar);
+// 	}
 //  	return (0);
 // }
