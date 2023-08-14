@@ -6,7 +6,7 @@
 /*   By: ahmalman <ahmalman@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/10 18:21:56 by ahmalman          #+#    #+#             */
-/*   Updated: 2023/08/10 18:52:45 by ahmalman         ###   ########.fr       */
+/*   Updated: 2023/08/14 22:49:19 by ahmalman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ static char	*reader(int fd, char *lineextra, int buffsize, int i)
 		i = read(fd, textsave, buffsize);
 		if (i == -1)
 		{
+			free (lineextra);
 			free (textsave);
 			return (NULL);
 		}
@@ -103,8 +104,9 @@ char	*get_next_line(int fd)
 	static char	*lineextra;
 	char		*srt;
 
-	if (fd < 0)
+	if (fd < 0 || read(fd, lineextra, 0) == -1)
 		return (NULL);
+		
 	lineextra = reader(fd, lineextra, BUFFER_SIZE, 1);
 	if (lineextra == NULL)
 		return (NULL);

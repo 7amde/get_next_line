@@ -6,7 +6,7 @@
 /*   By: ahmalman <ahmalman@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/10 18:21:56 by ahmalman          #+#    #+#             */
-/*   Updated: 2023/08/10 18:54:04 by ahmalman         ###   ########.fr       */
+/*   Updated: 2023/08/14 22:48:05 by ahmalman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ static char	*reader(int fd, char *lineextra, int buffsize, int i)
 		i = read(fd, textsave, buffsize);
 		if (i == -1)
 		{
+			free (lineextra);
 			free (textsave);
 			return (NULL);
 		}
