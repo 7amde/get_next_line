@@ -6,62 +6,59 @@
 /*   By: ahmalman <ahmalman@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/10 18:21:56 by ahmalman          #+#    #+#             */
-/*   Updated: 2023/08/14 22:48:05 by ahmalman         ###   ########.fr       */
+/*   Updated: 2023/08/16 20:58:30 by ahmalman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line_bonus.h"
 
-static char	*reader(int fd, char *lineextra, int buffsize, int i)
+static char	*reader(int fd, char *buffer, int i)
 {
 	char	*textsave;
 
-	textsave = (char *) malloc (sizeof(char) * buffsize + 1);
+	textsave = (char *) malloc (sizeof(char) * BUFFER_SIZE + 1);
 	if (!textsave)
 		return (NULL);
-	while (i == 1 && !ft_strchr(lineextra, '\n'))
+	while (i == 1 && !ft_strchr(buffer, '\n'))
 	{
-		i = read(fd, textsave, buffsize);
+		i = read(fd, textsave, BUFFER_SIZE);
 		if (i == -1)
 		{
-			free (lineextra);
+			free (buffer);
 			free (textsave);
 			return (NULL);
 		}
 		textsave[i] = '\0';
-		lineextra = ft_strjoin_gnl(lineextra, textsave);
+		buffer = ft_strjoin_gnl(buffer, textsave);
 		if (i)
 			i = 1;
 	}
 	free(textsave);
-	if (lineextra[0] == '\0')
-	{
-		free(lineextra);
-		return (NULL);
-	}
-	return (lineextra);
+	if (buffer[0] == '\0')
+		return (free(buffer), NULL);
+	return (buffer);
 }
 
-static char	*copy(char *srt1)
+static char	*spliter(char *str)
 {
 	int		i;
 	char	*res;
 
 	i = 0;
-	if (!srt1)
+	if (!str)
 		return (NULL);
-	while (srt1[i] != '\n' && srt1[i] != '\0')
+	while (str[i] != '\n' && str[i] != '\0')
 		i++;
 	res = (char *) malloc (sizeof (char) * i +2);
 	if (res == NULL)
 		return (NULL);
 	i = 0;
-	while (srt1[i] != '\n' && srt1[i] != '\0')
+	while (str[i] != '\n' && str[i] != '\0')
 	{
-		res[i] = srt1[i];
+		res[i] = str[i];
 		i++;
 	}
-	if (srt1[i] == '\n')
+	if (str[i] == '\n')
 	{
 		res[i] = '\n';
 		i++;
@@ -70,48 +67,48 @@ static char	*copy(char *srt1)
 	return (res);
 }
 
-static char	*lastline(char *srt2, int i, int c)
+static char	*lastline(char *str, int i, int c)
 {
-	char	*lsat;
+	char	*last;
 
-	if (!srt2)
+	if (!str)
 		return (NULL);
-	while (srt2[i] != '\n' && srt2[i] != '\0')
+	while (str[i] != '\n' && str[i] != '\0')
 		i++;
-	if (srt2[i] == '\0')
+	if (str[i] == '\0')
 	{
-		free(srt2);
+		free(str);
 		return (NULL);
 	}
 	i++;
 	c = i;
-	while (srt2[i])
+	while (str[i])
 		i++;
 	i = i - c;
-	lsat = (char *) malloc (sizeof (char) * i + 1);
-	if (lsat == NULL)
+	last = (char *) malloc (sizeof (char) * i + 1);
+	if (last == NULL)
 		return (NULL);
 	i = 0;
-	while (srt2[c] != '\0')
-		lsat[i++] = srt2[c++];
-	lsat[i] = '\0';
-	free(srt2);
-	return (lsat);
+	while (str[c] != '\0')
+		last[i++] = str[c++];
+	last[i] = '\0';
+	free(str);
+	return (last);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*lineextra[1024];
-	char		*srt;
+	static char	*buffer[1024];
+	char		*str;
 
-	if (fd < 0)
+	if (fd < 0 || BUFFER_SIZE < 0 || BUFFER_SIZE > 2147483646)
 		return (NULL);
-	lineextra[fd] = reader(fd, lineextra[fd], BUFFER_SIZE, 1);
-	if (lineextra[fd] == NULL)
+	buffer[fd] = reader(fd, buffer[fd], 1);
+	if (buffer[fd] == NULL)
 		return (NULL);
-	srt = copy(lineextra[fd]);
-	lineextra[fd] = lastline(lineextra[fd], 0, 0);
-	return (srt);
+	str = spliter(buffer[fd]);
+	buffer[fd] = lastline(buffer[fd], 0, 0);
+	return (str);
 }
 
 // int	main()

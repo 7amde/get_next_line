@@ -6,62 +6,59 @@
 /*   By: ahmalman <ahmalman@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/10 18:21:56 by ahmalman          #+#    #+#             */
-/*   Updated: 2023/08/14 22:49:19 by ahmalman         ###   ########.fr       */
+/*   Updated: 2023/08/16 20:58:21 by ahmalman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static char	*reader(int fd, char *lineextra, int buffsize, int i)
+static char	*reader(int fd, char *buffer, int i)
 {
 	char	*textsave;
 
-	textsave = (char *) malloc (sizeof(char) * buffsize + 1);
+	textsave = (char *) malloc (sizeof(char) * BUFFER_SIZE + 1);
 	if (!textsave)
 		return (NULL);
-	while (i == 1 && !ft_strchr(lineextra, '\n'))
+	while (i == 1 && !ft_strchr(buffer, '\n'))
 	{
-		i = read(fd, textsave, buffsize);
+		i = read(fd, textsave, BUFFER_SIZE);
 		if (i == -1)
 		{
-			free (lineextra);
+			free (buffer);
 			free (textsave);
 			return (NULL);
 		}
 		textsave[i] = '\0';
-		lineextra = ft_strjoin_gnl(lineextra, textsave);
+		buffer = ft_strjoin_gnl(buffer, textsave);
 		if (i)
 			i = 1;
 	}
 	free(textsave);
-	if (lineextra[0] == '\0')
-	{
-		free(lineextra);
-		return (NULL);
-	}
-	return (lineextra);
+	if (buffer[0] == '\0')
+		return (free(buffer), NULL);
+	return (buffer);
 }
 
-static char	*copy(char *srt1)
+static char	*spliter(char *str)
 {
 	int		i;
 	char	*res;
 
 	i = 0;
-	if (!srt1)
+	if (!str)
 		return (NULL);
-	while (srt1[i] != '\n' && srt1[i] != '\0')
+	while (str[i] != '\n' && str[i] != '\0')
 		i++;
 	res = (char *) malloc (sizeof (char) * i +2);
 	if (res == NULL)
 		return (NULL);
 	i = 0;
-	while (srt1[i] != '\n' && srt1[i] != '\0')
+	while (str[i] != '\n' && str[i] != '\0')
 	{
-		res[i] = srt1[i];
+		res[i] = str[i];
 		i++;
 	}
-	if (srt1[i] == '\n')
+	if (str[i] == '\n')
 	{
 		res[i] = '\n';
 		i++;
@@ -70,67 +67,65 @@ static char	*copy(char *srt1)
 	return (res);
 }
 
-static char	*lastline(char *srt2, int i, int c)
+static char	*lastline(char *str, int i, int c)
 {
-	char	*lsat;
+	char	*last;
 
-	if (!srt2)
+	if (!str)
 		return (NULL);
-	while (srt2[i] != '\n' && srt2[i] != '\0')
+	while (str[i] != '\n' && str[i] != '\0')
 		i++;
-	if (srt2[i] == '\0')
+	if (str[i] == '\0')
 	{
-		free(srt2);
+		free(str);
 		return (NULL);
 	}
 	i++;
 	c = i;
-	while (srt2[i])
+	while (str[i])
 		i++;
 	i = i - c;
-	lsat = (char *) malloc (sizeof (char) * i + 1);
-	if (lsat == NULL)
+	last = (char *) malloc (sizeof (char) * i + 1);
+	if (last == NULL)
 		return (NULL);
 	i = 0;
-	while (srt2[c] != '\0')
-		lsat[i++] = srt2[c++];
-	lsat[i] = '\0';
-	free(srt2);
-	return (lsat);
+	while (str[c] != '\0')
+		last[i++] = str[c++];
+	last[i] = '\0';
+	free(str);
+	return (last);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*lineextra;
-	char		*srt;
+	static char	*buffer;
+	char		*str;
 
-	if (fd < 0 || read(fd, lineextra, 0) == -1)
+	if (fd < 0 || BUFFER_SIZE < 0 || BUFFER_SIZE > 2147483646)
 		return (NULL);
-		
-	lineextra = reader(fd, lineextra, BUFFER_SIZE, 1);
-	if (lineextra == NULL)
+	buffer = reader(fd, buffer, 1);
+	if (buffer == NULL)
 		return (NULL);
-	srt = copy(lineextra);
-	lineextra = lastline(lineextra, 0, 0);
-	return (srt);
+	str = spliter(buffer);
+	buffer = lastline(buffer, 0, 0);
+	return (str);
 }
 
 // int	main()
 // {
 // 	char *annar;
 
-// 	int fd = open("input.txt", O_RDWR);
+// 	int fd = open("bible.txt", O_RDWR);
 // 	annar = get_next_line(fd);
 // 	printf ("%s",annar);
-// 	int fd1 = open("input2.txt", O_RDWR);
-// 	annar = get_next_line(fd1);
+// 	annar = get_next_line(fd);
 // 	printf ("%s",annar);
-// 	// annar = get_next_line(fd);
-// 	// printf ("%s",annar);
-// 	// while (annar)
-// 	// {
-// 	// 	annar = get_next_line(fd);
-// 	// 	printf ("%s",annar);
-// 	// }
+// 	while (annar)
+// 	{
+// 		annar = get_next_line(62);
+// 			annar = get_next_line(64);
+// 		annar = get_next_line(fd);
+// 		printf ("%s",annar);
+// 	}
 //  	return (0);
 // }
